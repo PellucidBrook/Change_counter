@@ -38,10 +38,14 @@ public class UserInterface {
 		return change;
 	}
 
-	public int getVersion() {
+	public int getVersionNum() {
 		return versionNum;
 	}
 
+	public int getChangeNum() {
+		return changeNum;
+	}
+	
 	public String getOldFilePath() {
 		return oldFilePath;
 	}
