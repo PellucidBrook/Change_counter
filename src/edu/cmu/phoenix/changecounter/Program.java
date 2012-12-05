@@ -33,6 +33,7 @@ public class Program {
 	public void setFileName(String newFilePath) {
 		String[] filePath = newFilePath.split("/");
 		String file = filePath[filePath.length-1];
+		//System.out.println(filePath[filePath.length-1]);
 		
 		this.fileName = file;
 	}
