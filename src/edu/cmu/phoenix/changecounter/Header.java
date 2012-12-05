@@ -3,11 +3,9 @@ package edu.cmu.phoenix.changecounter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,17 +112,72 @@ public class Header {
 	}
 	
 	
-	public void writeHeader(File file) throws IOException {
-		OutputStream stream = new FileOutputStream(file);
-		try {
-			writeHeader(stream);
-		} finally {
-			stream.close();
+	public String writeHeader(String contents) throws IOException {
+		Integer headerStart = findHeaderStart(contents);
+		Integer headerEnd = findHeaderEnd(contents);
+		
+		StringBuilder result = new StringBuilder();
+		
+		if(headerDoesExist(headerStart, headerEnd)) {
+			result.append(contents.substring(0, headerStart));
+			result.append(render());
+			result.append(contents.substring(headerEnd, contents.length()-1));
+		} else {
+			result.append(render());
+			result.append(System.getProperty("line.separator"));
+			result.append(contents);
+		}
+		
+		return result.toString();
+	}
+	
+	private boolean headerDoesExist(Integer start, Integer end) {
+		return start != null && end != null;
+	}
+	
+	private Integer findHeaderStart(String contents) {
+		Matcher match = headerStartPattern.matcher(contents);
+		if(match.matches()) {
+			return match.start();
+		} else {
+			return null;
+		}		
+	}
+	
+	private Integer findHeaderEnd(String contents) {
+		Matcher match = headerEndPattern.matcher(contents);
+		if(match.matches()) {
+			return match.end();
+		} else {
+			return null;
 		}
 	}
 	
-	public void writeHeader(OutputStream stream) {
+	
+	
+	public String render() {
+		StringBuilder result = new StringBuilder();
 		
+		String nl = System.getProperty("line.separator");
+		
+		result.append("/* Change History:");
+		result.append(nl);
+		
+		for(Integer version: getVersions()) {
+			result.append(String.format("* Version %d:", version));
+			result.append(nl);
+			
+			for(Change change: getChanges(version)) {
+				result.append(String.format("*  - Change %d: %s", change.getNumber(), change.getReason().toString()));
+				result.append(nl);
+			}
+			
+			result.append("*");
+			result.append(nl);
+		}
+		
+		result.append("*/");		
+		
+		return result.toString();
 	}
-
 }
