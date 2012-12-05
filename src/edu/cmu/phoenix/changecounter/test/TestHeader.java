@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.cmu.phoenix.changecounter.Change;
+import edu.cmu.phoenix.changecounter.Change.ReasonType;
 import edu.cmu.phoenix.changecounter.Header;
 
 public class TestHeader {
@@ -44,6 +45,29 @@ public class TestHeader {
 		
 		Assert.assertEquals(56, change.getNumber());
 		//Assert.assertEquals("Lorem Ipsum dolor sit amet, consectetuer adipiscing", change.getReason());
+	}
+	
+	@Test
+	public void testRender() {
+		Change change = new Change();
+		change.setNumber(32);
+		change.setReason(ReasonType.Enhancement);
+		
+		Header header = new Header();
+		
+		header.addChange(1, change);
+		
+		String output = header.render();
+		
+		String nl = System.getProperty("line.separator");
+		String expected = "/* Change History:" + nl
+				+ "* Version 1:" + nl
+				+ "*  - Change 32: Enhancement" + nl
+				+ "*" + nl
+				+ "*/";
+				
+		Assert.assertEquals(expected, output);	
+	
 	}
 
 }
