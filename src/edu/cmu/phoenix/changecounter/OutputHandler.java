@@ -10,41 +10,44 @@ import java.io.*;
  ****************************************/
 
 public class OutputHandler {
-	private OutputStream oStream;
-	
-        public OutputHandler() {
+        
+	public OutputHandler() {
 		
         }
 
-        public void writeChangeListing(Program newCL) {
+        public void writeChangeListing(Program newCL, OutputStream oStream) {
                 String stringToWrite;
 		Header headerToWrite;
 		
 		headerToWrite = newCL.getProgramHeader();
-
+		stringToWrite = headerToWrite.render();
 		try {
-			stringToWrite = headerToWrite.render();
+			oStream.writeChars(stringToWrite);
+			oStream.flush();
+			oStream.close();
                 } catch (IOException e) {
-
-                }
+			e.printStackTrace();
+                } 
 	}
 
-	public void writeAnnotatedSourceFile(Program newSF) {
+	public void writeAnnotatedSourceFile(Program newSF, OutputStream oStream) {
                 String stringToWrite;
                 Header headerToWrite;
-
+		
                 headerToWrite = newCL.getProgramHeader();
-
+		stringToWrite = newSF.contents; 
 		try {
-
+			oStream.writeChars(stringToWrite);
+                        oStream.flush();
+                        oStream.close();
 		} catch (IOException e) {
-
+			e.printStackTrace();
 		} 
 	}
 
-	public boolean closeIO () {
+	public boolean closeIO (OutputStream oStream) {
 	        try {
-			.close();
+			oStream.close();
 			return true;
                 } catch (IOException e) {
 			return false;
