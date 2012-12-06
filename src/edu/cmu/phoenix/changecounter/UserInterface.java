@@ -53,7 +53,7 @@ public class UserInterface {
 	public int getChangeNum() {
 		return changeNum;
 	}
-	
+
 	public String getOldFilePath() {
 		return oldFilePath;
 	}
@@ -105,6 +105,7 @@ public class UserInterface {
 	private Change.ReasonType getChangeReason() {
 		while(true) {
 			String reasonString = getUserInput("Enter a reason for this change: f (fix defect), e (enhancement), or n (new program)");
+			reasonString = reasonString.toLowerCase();
 
 			if (reasonString.equals("f")) {
 				return Change.ReasonType.Fix;
