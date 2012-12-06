@@ -71,6 +71,14 @@ public class Change {
 		this.changeDate = changeDate;
 	}
 	
+	public int getDefectNumber() {
+		return defectNumber;
+	}
+	
+	public void setDefectNumber(int defectNumber) {
+		this.defectNumber = defectNumber;
+	}
+	
 	public ReasonType getReason() {
 		return reason;
 	}
