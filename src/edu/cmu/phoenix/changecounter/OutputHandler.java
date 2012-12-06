@@ -17,16 +17,26 @@ public class OutputHandler {
         }
 
         public void writeChangeListing(Program newCL) {
-                try {
+                String stringToWrite;
+		Header headerToWrite;
+		
+		headerToWrite = newCL.getProgramHeader();
 
+		try {
+			stringToWrite = headerToWrite.render();
                 } catch (IOException e) {
 
                 }
 	}
 
 	public void writeAnnotatedSourceFile(Program newSF) {
+                String stringToWrite;
+                Header headerToWrite;
+
+                headerToWrite = newCL.getProgramHeader();
+
 		try {
-			
+
 		} catch (IOException e) {
 
 		} 
