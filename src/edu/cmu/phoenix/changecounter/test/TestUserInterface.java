@@ -30,14 +30,15 @@ public class TestUserInterface {
 	private static String SAMPLE_OLD_FILE_PATH = "aa/bb.txt";
 	private static String SAMPLE_NEW_FILE_PATH = "cc/dd.txt";
 	private static int SAMPLE_CHANGE = 3;
-	private static String prompt = "Generic prompt";
+	private static String SAMPLE_PROMPT = "Generic prompt";
+	private static String SAMPLE_INPUT = "1";
 	private UserInterface userInterface;
 	
 
 	
 	@Before
 	public void setUp() throws Exception {
-		userInterface = new UserInterface();
+		userInterface = new UserInterface(SAMPLE_OLD_VERSION, SAMPLE_NEW_VERSION, SAMPLE_OLD_FILE_PATH, SAMPLE_NEW_FILE_PATH);
 	}
 	@After
 	public void tearDown() throws Exception {
@@ -45,15 +46,28 @@ public class TestUserInterface {
 
 	@Test
 	public void testUserInterface() {
-		userInterface = new UserInterface();
+		UserInterface ui = new UserInterface();
 	}
 
 	public void testGetOldVersion() {
 		assertEquals(SAMPLE_OLD_VERSION, userInterface.getOldVersion());
 	}
 	
+	public void testGetNewVersion() {
+		assertEquals(SAMPLE_NEW_VERSION, userInterface.getNewVersion());
+	}
+	
+	public void testGetOldFilePath() {
+		assertEquals(SAMPLE_OLD_FILE_PATH, userInterface.getOldFilePath());
+	}
+	
+	public void testGetNewFilePath() {
+		assertEquals(SAMPLE_NEW_FILE_PATH, userInterface.getNewFilePath());
+	}
 	
 	
-	
+	public String testGetUserInput(String SAMPLE_PROMPT) {
+		return SAMPLE_INPUT;
+	}
 	
 }
