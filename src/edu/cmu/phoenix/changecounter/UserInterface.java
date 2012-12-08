@@ -23,7 +23,8 @@ import java.util.Date;
 public class UserInterface {
 
 	private Change change;
-	private int versionNum;
+	private int oldVersion;
+	private int newVersion;
 	private String oldFilePath;
 	private String newFilePath;
 	private int changeNum;
@@ -34,11 +35,17 @@ public class UserInterface {
 
 	//	Called by main to prompt user for change and version
 	public void executeUserInterface() {
-		versionNum = promptForVersionNumber();
+		System.out.println("First, I'll need the version number and file path for the old file.");
+		oldVersion = promptForVersionNumber();
+		oldFilePath = promptForFilePath();
+
+		System.out.println("Okay, Now I need the version number and file path for the new file.");
+		newVersion = promptForVersionNumber();
+		newFilePath = promptForFilePath();
+
 		changeNum = promptForChangeNumber();
 		change = promptForChangeInfo();
-		oldFilePath = promptForOldFilePath();
-		newFilePath = promptForNewFilePath();
+
 	}
 
 	// Getters for values called by main method
@@ -46,8 +53,12 @@ public class UserInterface {
 		return change;
 	}
 
-	public int getVersionNum() {
-		return versionNum;
+	public int getOldVersion() {
+		return oldVersion;
+	}
+
+	public int getNewVersion() {
+		return newVersion;
 	}
 
 	public int getChangeNum() {
@@ -75,16 +86,11 @@ public class UserInterface {
 	}
 
 	//	Prompts user for old file path. Currently accepts any string as valid file path.
-	private String promptForOldFilePath() {
-		String oldFilePath = getUserInput("Enter path for old file: ");
-		return oldFilePath;
+	private String promptForFilePath() {
+		String filePath = getUserInput("Enter path for file: ");
+		return filePath;
 	}
 
-	//	Prompts user for new file path. Currently accepts any string as valid file path.
-	private String promptForNewFilePath() {
-		String newFilePath = getUserInput("Enter path for new file: ");
-		return newFilePath;
-	}
 
 	/*	Prompts user for change information. 
 	 */
@@ -124,21 +130,18 @@ public class UserInterface {
 	 * If not, continues asking until valid number is entered. 
 	 */
 	private int getIntegerFromUser(String prompt) {
+		while(true) {
+			String input = getUserInput(prompt);
 
-		boolean validInput = false;
-		int userNumber = 0;
-		String input = getUserInput(prompt);
-
-		while(validInput == false) {
 			try {
-				userNumber = Integer.parseInt(input);
-				validInput = true;
+				int userNumber = Integer.parseInt(input);
+				return userNumber;
 			} catch (NumberFormatException n) {
 				System.out.println(input + " not an integer!");
 				input = getUserInput(prompt);
 			}
 		}
-		return userNumber;
+
 	}
 
 	/* Used as base method whenever the user interface asks for input from the user.
