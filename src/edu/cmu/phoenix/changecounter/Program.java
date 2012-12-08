@@ -16,7 +16,6 @@ import java.io.IOException;
 public class Program {
 	private int    version;
 	private String fileName;
-	private Change addedChange;
 	private int    totalLOC;
 	private Header programHeader;
 	
@@ -38,13 +37,6 @@ public class Program {
 		this.fileName = file;
 	}
 	
-	public Change getAddedChange() {
-		return addedChange;
-	}
-	public void setAddedChange(Change addedChange) {
-		this.addedChange = addedChange;
-	}
-	
 	public int getTotalLOC(File givenFilePath) throws IOException {
 		FileReader fileReader=new FileReader(givenFilePath);
 		BufferedReader lineReader=new BufferedReader(fileReader);
@@ -53,17 +45,16 @@ public class Program {
 		
 		do{
 			String line=lineReader.readLine();
-			if(line!=null){
-				isEOF=true;
+			if(line!=null) {
 				line=line.replaceAll("\\n|\\t|\\s", "");
 				
 				if((!line.equals("")) && (!line.startsWith("//"))) {
 					totalLOC = totalLOC + 1;
 				}
 			} else {
-				isEOF=false;
+				isEOF=true;
 			}
-		}while(isEOF);
+		}while(!isEOF);
 		
 		lineReader.close();
 		fileReader.close();
