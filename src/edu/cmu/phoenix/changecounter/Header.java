@@ -16,9 +16,13 @@ import java.util.regex.Pattern;
 
 /****************************************
  * 
- * Header is: *explain*
+ * The Header class maintains a programs version and change
+ * history in the header of a source file. It's primary
+ * roles are to parse the version and change data from
+ * an existing source file and to render the version and
+ * change data in the class into a header comment. 
  * 
- * @author 
+ * @author Micah Lee <mtl@cmu.edu> 
  *
  ****************************************/
 
@@ -28,9 +32,13 @@ public class Header {
 	private int headerBeginLine;
 	private int headerEndLine;
 	
+	// Match the pattern: /* Change History:
 	private Pattern headerStartPattern = Pattern.compile("^[ \\t]*/\\*[ \\t]*Change History:[ \\t]*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+	// Match the pattern: * Version <version_num>:
 	private Pattern versionPattern = Pattern.compile("^[ \\t]*\\*[ \\t]*Version[ \\t]*([\\d]+)[ \\t]*:[ \\t]*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+	// Match the pattern: *  - Change <change_num>: <change_reason> 
 	private Pattern changePattern = Pattern.compile("[ \\t]*\\*[\\t ]*-[ \\t]*Change[ \\t]*([\\d]*)[ \\t]*:([\\w\\d \\t$,./;\'\\[\\]{}:\"<>?~!@#$%^&\\*()`|\\\\]*)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+	// Match the pattern: */
 	private Pattern headerEndPattern = Pattern.compile("[ \\t]*\\*/[ \\t]*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 	
 	public void addVersion(Integer version) {
@@ -60,6 +68,9 @@ public class Header {
 		return versionChanges.get(version).toArray(array);
 	}
 	
+	/**
+	 * Initializes the class by parsing an existing source file.
+	 */
 	public void readHeader(File file) throws IOException {
 		InputStream stream = new FileInputStream(file);
 		try {
@@ -69,6 +80,9 @@ public class Header {
 		}
 	}
 	
+	/**
+	 * Initializes the class by parsing an existing source file.
+	 */
 	public void readHeader(InputStream stream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		
@@ -111,7 +125,12 @@ public class Header {
 		}
 	}
 	
-	
+	/**
+	 * Updates a source code listing with the current change header.
+	 * Either replaces an existing header or adds an initial header.
+	 * @param contents Source code listing to update
+	 * @return Updated source code listing
+	 */
 	public String writeHeader(String contents) throws IOException {
 		Integer headerStart = findHeaderStart(contents);
 		Integer headerEnd = findHeaderEnd(contents);
@@ -154,7 +173,9 @@ public class Header {
 	}
 	
 	
-	
+	/***
+	 * Renders the class content into a comment header
+	 */
 	public String render() {
 		StringBuilder result = new StringBuilder();
 		
