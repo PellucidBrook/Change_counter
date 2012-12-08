@@ -33,8 +33,12 @@ public class UserInterface {
 
 	}
 
+	public UserInterface(int oldVersion, int newVersion, String oldFilePath, String newFilePath) {
+		
+	}
+	
 	//	Called by main to prompt user for change and version
-	public void executeUserInterface() {
+	public UserInterface executeUserInterface() {
 		System.out.println("First, I'll need the version number and file path for the old file.");
 		oldVersion = promptForVersionNumber();
 		oldFilePath = promptForFilePath();
@@ -46,6 +50,8 @@ public class UserInterface {
 		changeNum = promptForChangeNumber();
 		change = promptForChangeInfo();
 
+		UserInterface userInterface = new UserInterface(oldVersion, newVersion, oldFilePath, newFilePath);
+		return userInterface;
 	}
 
 	// Getters for values called by main method
