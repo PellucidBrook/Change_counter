@@ -35,9 +35,9 @@ public class ChangeCounter {
 
 
 
-			int versionNum = ui.getVersionNum();
-			int changeNum = ui.getChangeNum();
-			Change change = ui.getChange();
+//			int versionNum = ui.getVersionNum();
+//			int changeNum = ui.getChangeNum();
+//			Change change = ui.getChange();
 
 
 
@@ -50,9 +50,9 @@ public class ChangeCounter {
 			OutputHandler outputHandler = new OutputHandler();
 			String outputType = ui.promptUserForOutputType();
 			if (outputType.equals("c")) {
-				outputHandler.writeChangeListing(newVersion, OutputStream oStream);
+				outputHandler.writeChangeListing(newProgram, OutputStream oStream);
 			} else if (outputType.equals("s")) {
-				outputHandler.writeAnnotatedSourceFile(newVersion, OutputStream oStream);
+				outputHandler.writeAnnotatedSourceFile(newProgram, OutputStream oStream);
 			} 
 			else {
 				System.out.println("WHAT HAVE YOU DONE? You shouldn't be here!");
