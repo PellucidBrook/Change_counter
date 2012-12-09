@@ -30,19 +30,46 @@ public class OutputHandler {
                 } 
 	}
 
-	public void writeAnnotatedSourceFile(Program newSF, OutputStream oStream) {
-                String stringToWrite;
-                Header headerToWrite;
+    /**
+     * Writes a source file with an updated header.
+     * 
+     * @param Program to write the updated source file for.
+     * @param Stream to write the updated source file to.
+     */
+	public void writeAnnotatedSourceFile(Program newSF, OutputStream oStream) throws Exception {
+		StringBuffer sourceFileData = new StringBuffer();
 		
-                headerToWrite = newCL.getProgramHeader();
-		stringToWrite = newSF.contents; 
+		// Read original file contents
+		BufferedReader reader = null;
 		try {
-			oStream.writeChars(stringToWrite);
-                        oStream.flush();
-                        oStream.close();
+			reader = new BufferedReader(new FileReader(newSF.getFileName()));		
+		
+			char[] buf = new char[1024];
+			int numRead = 0;				
+		
+			while((numRead=reader.read(buf)) != -1) {
+				String readData = String.valueOf(buf, 0, numRead);
+				sourceFileData.append(readData);
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+			throw new Exception("Unable to read original source file.", e);
+		} finally {
+			if(reader != null) {
+				reader.close();
+			}
+		}
+
+		// Write annotated source
+		PrintStream writer = null;
+		try {
+			String annotatedSource = newSF.getProgramHeader().writeHeader(sourceFileData.toString());
+			writer = new PrintStream(oStream);
+			writer.print(annotatedSource);
+		} catch (IOException e) {
+			throw new Exception("Unable to write annotated source file.", e);
+		} finally {
+			writer.close();
+		}
 	}
 
 	public boolean closeIO (OutputStream oStream) {
