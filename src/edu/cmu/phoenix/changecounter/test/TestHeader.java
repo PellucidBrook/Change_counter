@@ -28,12 +28,12 @@ public class TestHeader {
 		Header header = new Header();
 		
 		try {
-			header.readHeader(new File("./test_data/Header.java"));
+			header.readHeader(new File("./test_data/HeaderTestData.java"));
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
 		}
 		
-		Assert.assertEquals(2, header.getVersions().length);
+		Assert.assertEquals(3, header.getVersions().length);
 		Assert.assertTrue(header.hasVersion(1));
 		Assert.assertTrue(header.hasVersion(2));
 		
@@ -44,7 +44,7 @@ public class TestHeader {
 		Change change = changes[0];
 		
 		Assert.assertEquals(56, change.getNumber());
-		//Assert.assertEquals("Lorem Ipsum dolor sit amet, consectetuer adipiscing", change.getReason());
+		Assert.assertEquals(Change.ReasonType.Fix, change.getReason());
 	}
 	
 	@Test

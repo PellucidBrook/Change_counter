@@ -29,15 +29,14 @@ import java.util.regex.Pattern;
 public class Header {
 	private Map<Integer, List<Change>> versionChanges = new HashMap<Integer, List<Change>>();
 	
-	private int headerBeginLine;
-	private int headerEndLine;
-	
 	// Match the pattern: /* Change History:
 	private Pattern headerStartPattern = Pattern.compile("^[ \\t]*/\\*[ \\t]*Change History:[ \\t]*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 	// Match the pattern: * Version <version_num>:
 	private Pattern versionPattern = Pattern.compile("^[ \\t]*\\*[ \\t]*Version[ \\t]*([\\d]+)[ \\t]*:[ \\t]*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 	// Match the pattern: *  - Change <change_num>: <change_reason> 
 	private Pattern changePattern = Pattern.compile("[ \\t]*\\*[\\t ]*-[ \\t]*Change[ \\t]*([\\d]*)[ \\t]*:([\\w\\d \\t$,./;\'\\[\\]{}:\"<>?~!@#$%^&\\*()`|\\\\]*)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+	// Match the pattern: *  - Change <change_num>: Fix[<defect_num>] 
+	private Pattern changeFixPattern = Pattern.compile("[ \\t]*\\*[\\t ]*-[ \\t]*Change[ \\t]*([\\d]*)[ \\t]*:[ \\t]*(Fix)\\[([0-9]+)\\][ \\t]*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 	// Match the pattern: */
 	private Pattern headerEndPattern = Pattern.compile("[ \\t]*\\*/[ \\t]*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 	
@@ -108,17 +107,33 @@ public class Header {
 				if(matcher.matches()) {
 					currentVersion = Integer.parseInt(matcher.group(1));
 					addVersion(currentVersion);
+					continue;
+				}
+				
+				matcher = changeFixPattern.matcher(line);
+				
+				if(matcher.matches()) {
+					Change change = new Change();
+					change.setNumber(Integer.parseInt(matcher.group(1)));
+					change.setReason(Change.ReasonType.valueOf(matcher.group(2).trim()));
+					change.setDefectNumber(Integer.parseInt(matcher.group(3)));					
+					
+					if(currentVersion != null) {
+						addChange(currentVersion, change);
+					}
+					continue;
 				}
 				
 				matcher = changePattern.matcher(line);
 				if(matcher.matches()) {
 					Change change = new Change();
 					change.setNumber(Integer.parseInt(matcher.group(1)));
-					//change.setReason(Change.ReasonType.matcher.group(2));
+					change.setReason(Change.ReasonType.valueOf(matcher.group(2).trim()));
 					
 					if(currentVersion != null) {
 						addChange(currentVersion, change);
 					}
+					continue;
 				}
 				
 			}
@@ -189,7 +204,12 @@ public class Header {
 			result.append(nl);
 			
 			for(Change change: getChanges(version)) {
-				result.append(String.format("*  - Change %d: %s", change.getNumber(), change.getReason().toString()));
+				if(change.getReason() == Change.ReasonType.Fix) {
+					result.append(String.format("*  - Change %d: %s[%d]", change.getNumber(), change.getReason().toString(), change.getDefectNumber()));
+				} else {
+					result.append(String.format("*  - Change %d: %s", change.getNumber(), change.getReason().toString()));	
+				}
+				
 				result.append(nl);
 			}
 			

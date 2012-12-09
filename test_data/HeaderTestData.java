@@ -1,9 +1,12 @@
 /* Change History:
  * Version 1:
- *  - Change 56: Lorem Ipsum dolor sit amet, consectetuer adipiscing
+ *  - Change 56: Fix[90]
  *
  * Version 2:
- *  - Change 102: Lorem Ipsum dolor sit amet, consectetuer adipiscing
+ *  - Change 102: Enhancement
+ *  
+ * Version 3:
+ *  - Change 607: New
  * 
  */
 
