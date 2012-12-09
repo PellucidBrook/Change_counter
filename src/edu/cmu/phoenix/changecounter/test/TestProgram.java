@@ -10,7 +10,7 @@ import edu.cmu.phoenix.changecounter.Program;
 
 
 public class TestProgram {
-	private Program program;
+	private Program program = new Program();
 
 	@Before
 	public void setUp() throws Exception {
@@ -30,5 +30,18 @@ public class TestProgram {
 		
 		assertEquals(expectedFileName, actualFileName);
 	}
+	
+	@Test
+	public void testSetVersion() {
+		int version = 1;
+		
+		
+		program.setVersion(version);
+		int actualVersion= program.getVersion();
+		
+		assertEquals(version, actualVersion);
+	}
+	
+	
 
 }
