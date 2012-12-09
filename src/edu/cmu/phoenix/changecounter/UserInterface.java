@@ -22,11 +22,8 @@ import java.util.Date;
 
 public class UserInterface {
 
-	public static enum OutputType {
-		ChangeListing, SourceFile
-	}
 
-
+	private String userName;
 	private Change change;
 	private int oldVersion;
 	private int newVersion;
@@ -43,28 +40,38 @@ public class UserInterface {
 	}
 
 	//	Called by main to prompt user for change and version
-	public UserInterface executeUserInterface() {
+	public void executeUserInterface() {
 		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
-		System.out.println("Let's not get ahead of ourselves though. What's your name?");
+		System.out.println("You're going to need to files to compare and I'll ask you for additional information along the way");
+		System.out.println("Let's not get ahead of ourselves though.");
 		
+//		Get user name
+		userName =  promptForUserName();
 		
+//		Get file paths for old and new files
+		System.out.println("Okay " + userName + ", now I'm going to get some information about the two files you want to compare.");
+		oldFilePath = promptForFilePath("What's the path for the old file?");
+		newFilePath = promptForFilePath("What's the path for the new file?");
 		
-		
-		
-		System.out.println("First, I'll need the version number and file path for the old file.");
-		oldVersion = promptForVersionNumber();
-		oldFilePath = promptForFilePath();
-
-		System.out.println("Okay, Now I need the version number and file path for the new file.");
+//		Get version number of new file
+		System.out.println("Okay, Now I need the version number for the new file.");
 		newVersion = promptForVersionNumber();
-		newFilePath = promptForFilePath();
+		
 
-		changeNum = promptForChangeNumber();
-		change = promptForChangeInfo();
+//		changeNum = promptForChangeNumber();
+//		change = promptForChangeInfo();
 
-		UserInterface userInterface = new UserInterface(oldVersion, newVersion, oldFilePath, newFilePath);
-		return userInterface;
+//		UserInterface userInterface = new UserInterface(oldVersion, newVersion, oldFilePath, newFilePath);
+//		return userInterface;
 	}
+
+
+	private String promptForUserName() {
+		String userName = getUserInput("What's your name, good lookin'?");
+		System.out.println("What a nice name. I'm going to use that as your user name when we record the change information.");	
+		return userName;
+	}
+
 
 
 
@@ -88,8 +95,8 @@ public class UserInterface {
 	}
 
 	//	Prompts user for old file path. Currently accepts any string as valid file path.
-	private String promptForFilePath() {
-		String filePath = getUserInput("Enter path for file: ");
+	private String promptForFilePath(String prompt) {
+		String filePath = getUserInput(prompt);
 		return filePath;
 	}
 
@@ -99,7 +106,7 @@ public class UserInterface {
 	private Change promptForChangeInfo() {
 
 		System.out.println("Let's get a little information about the change you're looking at.");
-		String userName = getUserInput("Enter user name: ");
+
 		Date changeDate = new Date();
 		Change.ReasonType reason = getChangeReason();
 
@@ -206,6 +213,6 @@ public class UserInterface {
 	public String getNewFilePath() {
 		return newFilePath;
 	}
-	
+
 
 }
