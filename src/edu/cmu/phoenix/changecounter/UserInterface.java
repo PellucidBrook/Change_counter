@@ -136,13 +136,6 @@ public class UserInterface {
 		}
 	}
 
-
-	//	//	Prompts user for change number. Only integer values are accepted for change number.
-	//	private int promptForChangeNumber() {
-	//		int changeNumber = getIntegerFromUser("Enter a change number: ");
-	//		return changeNumber;
-	//	}
-
 	//	Prompts user for old file path. Currently accepts any string as valid file path.
 	private String promptForFilePath(String prompt) {
 		String filePath = getUserInput(prompt);
@@ -152,6 +145,11 @@ public class UserInterface {
 
 	/*	Prompts user for change information. 
 	 */
+	
+//	public Change executeChangeAssignment() {
+	
+//	}
+	
 	public Change promptForChangeInfo() {
 
 		System.out.println("Let me get a little information about the change you're making.");
