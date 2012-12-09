@@ -23,7 +23,7 @@ import java.util.Date;
 public class UserInterface {
 
 
-//	public Program program;
+	//	public Program program;
 	private String userName;
 	private Change change;
 	private int oldVersion;
@@ -31,8 +31,9 @@ public class UserInterface {
 	private String oldFilePath;
 	private String newFilePath;
 	private int changeNum;
-	
-//	OutputInformation
+	private int defectNum;
+
+	//	OutputInformation
 	private String outputType;
 	private String sourceFile;
 	private String changeFile;
@@ -50,36 +51,36 @@ public class UserInterface {
 		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
 		System.out.println("You're going to need to files to compare and I'll ask you for additional information along the way");
 		System.out.println("Let's not get ahead of ourselves though.");
-		
-//		Get user name
+
+		//		Get user name
 		userName =  promptForUserName();
-		
-//		Get file paths for old and new files
+
+		//		Get file paths for old and new files
 		System.out.println("Okay " + userName + ", now I'm going to get some information about the two files you want to compare.");
 		oldFilePath = promptForFilePath("What's the path for the old file?");
 		newFilePath = promptForFilePath("What's the path for the new file?");
-		
-//		Get version number of new file
+
+		//		Get version number of new file
 		System.out.println("Okay, Now I need the version number for the new file.");
 		newVersion = promptForVersionNumber();
-		
 
-//		changeNum = promptForChangeNumber();
-//		change = promptForChangeInfo();
 
-//		UserInterface userInterface = new UserInterface(oldVersion, newVersion, oldFilePath, newFilePath);
-//		return userInterface;
+		//		changeNum = promptForChangeNumber();
+		//		change = promptForChangeInfo();
+
+		//		UserInterface userInterface = new UserInterface(oldVersion, newVersion, oldFilePath, newFilePath);
+		//		return userInterface;
 	}
 
 	public void executeOutputMethod(Program newProgram) throws Exception {
-		
+
 		OutputHandler outputHandler = new OutputHandler();
-		
+
 		outputType = promptForOutputType();
-		
+
 		String sourcePrompt = "Enter file path to annotated source file: ";
 		String changePrompt = "Enter file path to change listing: ";
-		
+
 		if (outputType.equals("c")) {
 			changeFile = promptForFilePath(changePrompt);
 			final OutputStream outputStreamChangeFile;
@@ -90,7 +91,7 @@ public class UserInterface {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		} else if (outputType.equals("s")) {
 			sourceFile = promptForFilePath(sourcePrompt);
 			final OutputStream outputStreamSourceFile;
@@ -101,18 +102,18 @@ public class UserInterface {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		} else if (outputType.equals("b")) {
 			changeFile = promptForFilePath(changePrompt);
 			sourceFile = promptForFilePath(sourcePrompt);
 		} else {
 			System.out.println("WHAT HAVE YOU DONE? You shouldn't be here! There must have been a problem getting the output type from the user");
 		}
-			
+
 
 	}
-	
-	
+
+
 
 	private String promptForUserName() {
 		String userName = getUserInput("What's your name, good lookin'?");
@@ -136,11 +137,11 @@ public class UserInterface {
 	}
 
 
-	//	Prompts user for change number. Only integer values are accepted for change number.
-	private int promptForChangeNumber() {
-		int changeNumber = getIntegerFromUser("Enter a change number: ");
-		return changeNumber;
-	}
+	//	//	Prompts user for change number. Only integer values are accepted for change number.
+	//	private int promptForChangeNumber() {
+	//		int changeNumber = getIntegerFromUser("Enter a change number: ");
+	//		return changeNumber;
+	//	}
 
 	//	Prompts user for old file path. Currently accepts any string as valid file path.
 	private String promptForFilePath(String prompt) {
@@ -151,14 +152,19 @@ public class UserInterface {
 
 	/*	Prompts user for change information. 
 	 */
-	private Change promptForChangeInfo() {
+	public Change promptForChangeInfo() {
 
-		System.out.println("Let's get a little information about the change you're looking at.");
-
+		System.out.println("Let me get a little information about the change you're making.");
+		changeNum = getIntegerFromUser("Enter a change number: ");
 		Date changeDate = new Date();
 		Change.ReasonType reason = getChangeReason();
+		Change change = new Change(changeNum, userName, changeDate, reason);
+		if (reason.equals(Change.ReasonType.Fix)) {
+			change.setDefectNumber(defectNum);
+		}
 
-		return new Change(changeNum, userName, changeDate, reason);
+		return change;
+
 	}
 
 	/*	Asks user for reason type. 
@@ -171,6 +177,8 @@ public class UserInterface {
 			reasonString = reasonString.toLowerCase();
 
 			if (reasonString.equals("f")) {
+				System.out.println("Okay, you're committing a fix to a defect.");
+				defectNum = getIntegerFromUser("Enter a defect number (must be an integer):");
 				return Change.ReasonType.Fix;
 			} else if (reasonString.equals("e")) {
 				return Change.ReasonType.Enhancement;

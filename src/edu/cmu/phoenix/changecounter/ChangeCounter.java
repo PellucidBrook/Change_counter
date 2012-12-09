@@ -1,7 +1,8 @@
 package edu.cmu.phoenix.changecounter;
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+//import java.io.FileOutputStream;
+import java.io.IOException;
+//import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class ChangeCounter {
@@ -24,11 +25,20 @@ public class ChangeCounter {
 			newProgram.setVersion(userInterface.getNewVersion());
 			newProgram.setFileName(userInterface.getNewFilePath());
 
+
 			// Send oldProgram and newProgram into ProgramComparer
-			ProgramComparer pc = new ProgramComparer();
-			ArrayList<ModifiedLine> = pc.compare(oldProgram, newProgram);
+			ProgramComparer programComparer = new ProgramComparer();
+			try {
+				ArrayList<ModifiedLine> modifiedLine = programComparer.compare(oldProgram, newProgram);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-
+			Change change = userInterface.promptForChangeInfo();
+			
+			
 			// Get change information from user
 
 
@@ -36,9 +46,9 @@ public class ChangeCounter {
 
 
 
-//			int versionNum = ui.getVersionNum();
-//			int changeNum = ui.getChangeNum();
-//			Change change = ui.getChange();
+			//			int versionNum = ui.getVersionNum();
+			//			int changeNum = ui.getChangeNum();
+			//			Change change = ui.getChange();
 
 
 
@@ -48,7 +58,12 @@ public class ChangeCounter {
 
 
 			//		Ask user if they want to write the output to the change listing or source file
-			userInterface.executeOutputMethod(newProgram);
+			try {
+				userInterface.executeOutputMethod(newProgram);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 
 		}
