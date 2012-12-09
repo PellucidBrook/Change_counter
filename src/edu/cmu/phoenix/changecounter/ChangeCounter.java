@@ -17,14 +17,8 @@ public class ChangeCounter {
 			userInterface.executeInitialQuestions();
 
 			//	  Create oldVersion and newVersion of Program class
-			Program oldProgram = new Program();
-			oldProgram.setVersion(userInterface.getOldVersion());
-			oldProgram.setFileName(userInterface.getOldFilePath());
-
-			Program newProgram = new Program();
-			newProgram.setVersion(userInterface.getNewVersion());
-			newProgram.setFileName(userInterface.getNewFilePath());
-
+			Program oldProgram = new Program(userInterface.getOldVersion(), userInterface.getOldFilePath());
+			Program newProgram = new Program(userInterface.getNewVersion(), userInterface.getNewFilePath());
 
 			// Send oldProgram and newProgram into ProgramComparer
 			ProgramComparer programComparer = new ProgramComparer();
@@ -37,25 +31,7 @@ public class ChangeCounter {
 			}
 
 			Change change = userInterface.promptForChangeInfo();
-			
-			
-			// Get change information from user
-
-
-
-
-
-
-			//			int versionNum = ui.getVersionNum();
-			//			int changeNum = ui.getChangeNum();
-			//			Change change = ui.getChange();
-
-
-
-
-
-
-
+			newProgram.addChange(change);
 
 			//		Ask user if they want to write the output to the change listing or source file
 			try {
