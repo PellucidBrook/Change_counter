@@ -22,6 +22,11 @@ import java.util.Date;
 
 public class UserInterface {
 
+	public static enum OutputType {
+		ChangeListing, SourceFile
+	}
+
+
 	private Change change;
 	private int oldVersion;
 	private int newVersion;
@@ -34,11 +39,18 @@ public class UserInterface {
 	}
 
 	public UserInterface(int oldVersion, int newVersion, String oldFilePath, String newFilePath) {
-		
+
 	}
-	
+
 	//	Called by main to prompt user for change and version
 	public UserInterface executeUserInterface() {
+		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
+		System.out.println("Let's not get ahead of ourselves though. What's your name?");
+		
+		
+		
+		
+		
 		System.out.println("First, I'll need the version number and file path for the old file.");
 		oldVersion = promptForVersionNumber();
 		oldFilePath = promptForFilePath();
@@ -54,36 +66,20 @@ public class UserInterface {
 		return userInterface;
 	}
 
-	// Getters for values called by main method
-	public Change getChange() {
-		return change;
-	}
 
-	public int getOldVersion() {
-		return oldVersion;
-	}
-
-	public int getNewVersion() {
-		return newVersion;
-	}
-
-	public int getChangeNum() {
-		return changeNum;
-	}
-
-	public String getOldFilePath() {
-		return oldFilePath;
-	}
-
-	public String getNewFilePath() {
-		return newFilePath;
-	}
 
 	//	Prompts user for version number. Only integer values are accepted for version number.
 	private int promptForVersionNumber() {
-		int version = getIntegerFromUser("Enter a version number: ");
-		return version;
+		while(true) {
+			int newVersion = getIntegerFromUser("Enter a version number for the new version: (Must be an integer greater than zero)");
+			if (newVersion < 1) {
+				System.out.println("Version Number: " + newVersion + " not greater than zero.");
+			} else {
+				return newVersion;
+			}
+		}
 	}
+
 
 	//	Prompts user for change number. Only integer values are accepted for change number.
 	private int promptForChangeNumber() {
@@ -131,6 +127,22 @@ public class UserInterface {
 		}
 	}
 
+
+	public String promptUserForOutputType() {
+		while(true) {
+			String outputType = getUserInput("How would you like to save the output?: c (change listing), or s (source file)");
+			outputType = outputType.toLowerCase();
+
+			if (outputType.equals("c") || outputType.equals("s")) {
+				return outputType;
+			} else {
+				System.out.println("Sorry, I don't recognize that change reason.");
+			}
+		}
+	}
+
+
+
 	/* Used for change number and version number. 
 	 * Makes sure that the value the user enters is an integer.
 	 * If not, continues asking until valid number is entered. 
@@ -167,5 +179,33 @@ public class UserInterface {
 		}
 		return inputLine;
 	}
+
+
+	// Getters for values called by main method
+	public Change getChange() {
+		return change;
+	}
+
+	public int getOldVersion() {
+		oldVersion = newVersion - 1;
+		return oldVersion;
+	}
+
+	public int getNewVersion() {
+		return newVersion;
+	}
+
+	public int getChangeNum() {
+		return changeNum;
+	}
+
+	public String getOldFilePath() {
+		return oldFilePath;
+	}
+
+	public String getNewFilePath() {
+		return newFilePath;
+	}
+	
 
 }
