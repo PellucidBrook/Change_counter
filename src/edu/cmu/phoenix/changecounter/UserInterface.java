@@ -23,6 +23,7 @@ import java.util.Date;
 public class UserInterface {
 
 
+//	public Program program;
 	private String userName;
 	private Change change;
 	private int oldVersion;
@@ -30,6 +31,11 @@ public class UserInterface {
 	private String oldFilePath;
 	private String newFilePath;
 	private int changeNum;
+	
+//	OutputInformation
+	private String outputType;
+	private String sourceFile;
+	private String changeFile;
 
 	public UserInterface() {
 
@@ -40,7 +46,7 @@ public class UserInterface {
 	}
 
 	//	Called by main to prompt user for change and version
-	public void executeUserInterface() {
+	public void executeInitialQuestions() {
 		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
 		System.out.println("You're going to need to files to compare and I'll ask you for additional information along the way");
 		System.out.println("Let's not get ahead of ourselves though.");
@@ -65,6 +71,48 @@ public class UserInterface {
 //		return userInterface;
 	}
 
+	public void executeOutputMethod(Program newProgram) throws Exception {
+		
+		OutputHandler outputHandler = new OutputHandler();
+		
+		outputType = promptForOutputType();
+		
+		String sourcePrompt = "Enter file path to annotated source file: ";
+		String changePrompt = "Enter file path to change listing: ";
+		
+		if (outputType.equals("c")) {
+			changeFile = promptForFilePath(changePrompt);
+			final OutputStream outputStreamChangeFile;
+			try {
+				outputStreamChangeFile = new FileOutputStream(changeFile);
+				outputHandler.writeChangeListing(newProgram, outputStreamChangeFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} else if (outputType.equals("s")) {
+			sourceFile = promptForFilePath(sourcePrompt);
+			final OutputStream outputStreamSourceFile;
+			try {
+				outputStreamSourceFile = new FileOutputStream(sourceFile);
+				outputHandler.writeAnnotatedSourceFile(newProgram, outputStreamSourceFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} else if (outputType.equals("b")) {
+			changeFile = promptForFilePath(changePrompt);
+			sourceFile = promptForFilePath(sourcePrompt);
+		} else {
+			System.out.println("WHAT HAVE YOU DONE? You shouldn't be here! There must have been a problem getting the output type from the user");
+		}
+			
+
+	}
+	
+	
 
 	private String promptForUserName() {
 		String userName = getUserInput("What's your name, good lookin'?");
@@ -135,12 +183,12 @@ public class UserInterface {
 	}
 
 
-	public String promptUserForOutputType() {
+	public String promptForOutputType() {
 		while(true) {
-			String outputType = getUserInput("How would you like to save the output?: c (change listing), or s (source file)");
+			String outputType = getUserInput("How would you like to save the output?: c (change listing), s (annotated source file), or b (both)?");
 			outputType = outputType.toLowerCase();
 
-			if (outputType.equals("c") || outputType.equals("s")) {
+			if (outputType.equals("c") || outputType.equals("s") || outputType.equals("b")) {
 				return outputType;
 			} else {
 				System.out.println("Sorry, I don't recognize that change reason.");

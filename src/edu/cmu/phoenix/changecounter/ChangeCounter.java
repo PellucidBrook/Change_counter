@@ -1,5 +1,6 @@
 package edu.cmu.phoenix.changecounter;
 
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ public class ChangeCounter {
 
 
 			UserInterface userInterface = new UserInterface();
-			userInterface.executeUserInterface();
+			userInterface.executeInitialQuestions();
 
 			//	  Create oldVersion and newVersion of Program class
 			Program oldProgram = new Program();
@@ -47,16 +48,7 @@ public class ChangeCounter {
 
 
 			//		Ask user if they want to write the output to the change listing or source file
-			OutputHandler outputHandler = new OutputHandler();
-			String outputType = ui.promptUserForOutputType();
-			if (outputType.equals("c")) {
-				outputHandler.writeChangeListing(newProgram, OutputStream oStream);
-			} else if (outputType.equals("s")) {
-				outputHandler.writeAnnotatedSourceFile(newProgram, OutputStream oStream);
-			} 
-			else {
-				System.out.println("WHAT HAVE YOU DONE? You shouldn't be here!");
-			}
+			userInterface.executeOutputMethod(newProgram);
 
 
 		}
