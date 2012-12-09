@@ -17,7 +17,17 @@ public class Program {
 	private int    version;
 	private String fileName;
 	private int    totalLOC;
-	private Header programHeader;
+	private Header programHeader = new Header();
+	
+	public Program(int version, String newFilePath) {
+		super();
+		this.version = version;
+		programHeader.addVersion(version);
+		
+		String[] filePath = newFilePath.split("/");
+		String file = filePath[filePath.length-1];
+		this.fileName = file;
+	}
 	
 	public int getVersion() {
 		return version;
@@ -32,7 +42,6 @@ public class Program {
 	public void setFileName(String newFilePath) {
 		String[] filePath = newFilePath.split("/");
 		String file = filePath[filePath.length-1];
-		//System.out.println(filePath[filePath.length-1]);
 		
 		this.fileName = file;
 	}
@@ -68,8 +77,10 @@ public class Program {
 	public Header getProgramHeader() {
 		return programHeader;
 	}
-	public void setProgramHeader(Header programHeader) {
-		this.programHeader = programHeader;
+	
+	public void addChange(Change change) {
+		programHeader.addChange(version, change);
 	}
+	
 	
 }
