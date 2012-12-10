@@ -50,32 +50,35 @@ public class UserInterface {
 
 	//	Called by main to prompt user for change and version
 	public void executeInitialQuestions() {
+		printOutputTopic("TSP CHANGE COUNTER");
 		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
 		System.out.println("You're going to need to files to compare and I'll ask you for additional information along the way");
+
+		printOutputTopic("GATHERING INITIAL INFORMATION");
 		System.out.println("Let's not get ahead of ourselves though.");
 
 		//		Get user name
 		userName =  promptForUserName();
 
 		//		Get file paths for old and new files
+		System.out.println(" ");
 		System.out.println("Okay " + userName + ", now I'm going to get some information about the two files you want to compare.");
 		oldFilePath = promptForFilePath("What's the path for the old file?");
 		newFilePath = promptForFilePath("What's the path for the new file?");
 
 		//		Get version number of new file
+		System.out.println(" ");
 		System.out.println("Okay, Now I need the version number for the new file.");
 		newVersion = promptForVersionNumber();
+	}
 
-
-		//		changeNum = promptForChangeNumber();
-		//		change = promptForChangeInfo();
-
-		//		UserInterface userInterface = new UserInterface(oldVersion, newVersion, oldFilePath, newFilePath);
-		//		return userInterface;
+	private void printOutputTopic(String topic) {
+		System.out.println("  ");
+		System.out.println("~~~~~~  " + topic + "  ~~~~~~");
 	}
 
 	public void executeOutputMethod(Program newProgram) throws Exception {
-
+		printOutputTopic("DEFINE OUTPUT TYPE");
 		outputType = promptForOutputType();
 
 		if (outputType.equals("c")) {
@@ -139,11 +142,11 @@ public class UserInterface {
 		}
 	}
 
-//		Prompts user for old file path. Currently accepts any string as valid file path.
+	//		Prompts user for old file path. Currently accepts any string as valid file path.
 	private String promptForFilePath(String prompt) {
 		return promptForFilePath(prompt, false);
 	}
-	
+
 	//	Prompts user for old file path. Currently accepts any string as valid file path.
 	private String promptForFilePath(String prompt, boolean createFile) {
 
@@ -173,6 +176,7 @@ public class UserInterface {
 	 */
 
 	public ArrayList<Change> executeChangeAssignment(ArrayList<ModifiedLine> modifiedLines) {
+		printOutputTopic("CHANGE INFORMATION");
 		System.out.println("Let me get a little information about the changes you're making.");
 		System.out.println("I'm going to print out each line of the new file that has been changed from the previous version.");
 		System.out.println("And for each one, I'll ask you to assign a number to that change and the reason for the change.");
@@ -183,14 +187,13 @@ public class UserInterface {
 		ArrayList<Change> changes = new ArrayList<Change>();
 
 		for (ModifiedLine line : modifiedLines) {
+			int oldChange = 0;
 			{
+				oldChange = 0;
 				System.out.println("Next modified line (line " + line.getLineNumber() + ")");
 				System.out.println(line.getLine());
 
-
 				int changeNum = getIntegerFromUser("Enter a change number for this line: ");
-
-				int oldChange = 0;
 
 				for(Change change : changes) {
 					if(change.getNumber() == changeNum) {
@@ -199,7 +202,6 @@ public class UserInterface {
 						oldChange = 1;
 						break; }
 				}
-
 				if (oldChange == 0) {
 					System.out.println("You haven't used this change number before.");
 					System.out.println("I'll need to get a reason for this change from you.");
@@ -212,10 +214,6 @@ public class UserInterface {
 
 
 	public Change createNewChange(int changeNum) {
-
-
-		//		changeNum = getIntegerFromUser("Enter a change number: ");
-		//		Date changeDate = new Date();
 		Change.ReasonType reason = getChangeReason();
 		Change change = new Change(changeNum, userName, changeDate, reason);
 		if (reason.equals(Change.ReasonType.Fix)) {
@@ -224,7 +222,6 @@ public class UserInterface {
 			change.setDefectNumber(defectNum);
 		}
 		return change;
-
 	}
 
 	/*	Asks user for reason type. 
@@ -282,7 +279,6 @@ public class UserInterface {
 	}
 
 
-
 	/* Used for change number and version number. 
 	 * Makes sure that the value the user enters is an integer.
 	 * If not, continues asking until valid number is entered. 
@@ -334,10 +330,6 @@ public class UserInterface {
 	public int getNewVersion() {
 		return newVersion;
 	}
-
-	//	public int getChangeNum() {
-	//		return changeNum;
-	//	}
 
 	public String getOldFilePath() {
 		return oldFilePath;
