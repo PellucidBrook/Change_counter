@@ -1,6 +1,7 @@
 package edu.cmu.phoenix.changecounter;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 /****************************************
@@ -25,18 +26,19 @@ public class UserInterface {
 
 	//	public Program program;
 	private String userName;
-	private Change change;
+	//	private Change change;
 	private int oldVersion;
 	private int newVersion;
 	private String oldFilePath;
 	private String newFilePath;
-	private int changeNum;
-	private int defectNum;
+	//	private int changeNum;
+	//	private int defectNum;
 
 	//	OutputInformation
 	private String outputType;
 	private String sourceFile;
 	private String changeFile;
+	private Date changeDate = new Date();
 
 	public UserInterface() {
 
@@ -145,22 +147,52 @@ public class UserInterface {
 
 	/*	Prompts user for change information. 
 	 */
-	
-//	public Change executeChangeAssignment() {
-	
-//	}
-	
-	public Change promptForChangeInfo() {
 
-		System.out.println("Let me get a little information about the change you're making.");
-		changeNum = getIntegerFromUser("Enter a change number: ");
-		Date changeDate = new Date();
+	public ArrayList<Change> executeChangeAssignment(ArrayList<ModifiedLine> modifiedLines) {
+		System.out.println("Let me get a little information about the changes you're making.");
+		System.out.println("I'm going to print out each line of the new file that has been changed from the previous version.");
+		System.out.println("And for each one, I'll ask you to assign a number to that change and the reason for the change.");
+		System.out.println("You can assign multiple modified lines to a single change number, so if you enter the same change number for two different lines,");
+		System.out.println("both of those lines will be associated with the same change number.");
+		System.out.println("If you're in a rush, you can also assign all remaning modified lines to a single change number and reason.");
+
+		ArrayList<Change> changes = new ArrayList<Change>();
+
+		for (ModifiedLine line : modifiedLines) {
+			{
+				System.out.println("Next modified line (line " + line.getLineNumber() + ")");
+				System.out.println(line.getLine());
+
+				int changeNum = getIntegerFromUser("Enter a change number for this line: ");
+				for(Change change : changes) {
+					if(change.getNumber() == changeNum) {
+						System.out.println("You've used this change number before. I'll add this line to that change.");
+						change.addLine(line);
+						break; }
+					else {
+						System.out.println("You haven't used this change number before.");
+						System.out.println("I'll need to get a reason for this change from you.");
+						changes.add(createNewChange(changeNum));
+					}
+				}	
+			}
+		}
+		return changes;	
+	}
+
+
+	public Change createNewChange(int changeNum) {
+
+
+		//		changeNum = getIntegerFromUser("Enter a change number: ");
+		//		Date changeDate = new Date();
 		Change.ReasonType reason = getChangeReason();
 		Change change = new Change(changeNum, userName, changeDate, reason);
 		if (reason.equals(Change.ReasonType.Fix)) {
+			System.out.println("Okay, you're committing a fix to a defect.");
+			int defectNum = getIntegerFromUser("Enter a defect number (must be an integer):");
 			change.setDefectNumber(defectNum);
 		}
-
 		return change;
 
 	}
@@ -175,8 +207,6 @@ public class UserInterface {
 			reasonString = reasonString.toLowerCase();
 
 			if (reasonString.equals("f")) {
-				System.out.println("Okay, you're committing a fix to a defect.");
-				defectNum = getIntegerFromUser("Enter a defect number (must be an integer):");
 				return Change.ReasonType.Fix;
 			} else if (reasonString.equals("e")) {
 				return Change.ReasonType.Enhancement;
@@ -242,10 +272,10 @@ public class UserInterface {
 	}
 
 
-	// Getters for values called by main method
-	public Change getChange() {
-		return change;
-	}
+	//	// Getters for values called by main method
+	//	public Change getChange() {
+	//		return change;
+	//	}
 
 	public int getOldVersion() {
 		oldVersion = newVersion - 1;
@@ -256,9 +286,9 @@ public class UserInterface {
 		return newVersion;
 	}
 
-	public int getChangeNum() {
-		return changeNum;
-	}
+	//	public int getChangeNum() {
+	//		return changeNum;
+	//	}
 
 	public String getOldFilePath() {
 		return oldFilePath;

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class ChangeCounter {
 
-	public static void main(String [] args) {
+	public static void main(String [] args) throws IOException {
 
 
 		while(true) {
@@ -22,16 +22,15 @@ public class ChangeCounter {
 
 			// Send oldProgram and newProgram into ProgramComparer
 			ProgramComparer programComparer = new ProgramComparer();
-			try {
-				ArrayList<ModifiedLine> modifiedLine = programComparer.compare(oldProgram, newProgram);
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 
-			Change change = userInterface.promptForChangeInfo();
-			newProgram.addChange(change);
+			ArrayList<ModifiedLine> modifiedLine = programComparer.compare(oldProgram, newProgram);
+
+			ArrayList<Change> changes = userInterface.executeChangeAssignment(modifiedLine);
+			for (Change change : changes) {
+				{
+					newProgram.addChange(change);
+				}
+			}
 
 			//		Ask user if they want to write the output to the change listing or source file
 			try {
