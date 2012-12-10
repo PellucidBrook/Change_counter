@@ -44,11 +44,17 @@ public class UserInterface {
 
 	}
 
+	/*
+	 * Constructor
+	 */
 	public UserInterface(int oldVersion, int newVersion, String oldFilePath, String newFilePath) {
 
 	}
 
-	//	Called by main to prompt user for change and version
+
+	/* 
+	 * Called by main to prompt user for change and version
+	 */
 	public void executeInitialQuestions() {
 		printOutputTopic("TSP CHANGE COUNTER");
 		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
@@ -72,11 +78,10 @@ public class UserInterface {
 		newVersion = promptForVersionNumber();
 	}
 
-	private void printOutputTopic(String topic) {
-		System.out.println("  ");
-		System.out.println("~~~~~~  " + topic + "  ~~~~~~");
-	}
 
+	/* 
+	 * Run in main. Begins sequence of saving change information to file.
+	 */
 	public void executeOutputMethod(Program newProgram) throws Exception {
 		printOutputTopic("DEFINE OUTPUT TYPE");
 		outputType = promptForOutputType();
@@ -95,6 +100,10 @@ public class UserInterface {
 		}
 	}
 
+
+	/* 
+	 * Gets change log file from user to print output to and calls OutputHandler to do the printing.
+	 */
 	private void promptForChangeOutput(Program newProgram) throws FileNotFoundException {
 		String changePrompt = "Enter file path to change listing: ";
 		OutputHandler outputHandler = new OutputHandler();
@@ -103,6 +112,10 @@ public class UserInterface {
 		outputHandler.writeChangeListing(newProgram, changeFile);
 	}
 
+
+	/* 
+	 * Gets source file from user to print output to and calls OutputHandler to do the printing.
+	 */
 	private void promptForSourceOutput(Program newProgram) {
 		String sourcePrompt = "Enter file path to annotated source file: ";
 		OutputHandler outputHandler = new OutputHandler();
@@ -121,6 +134,9 @@ public class UserInterface {
 	}
 
 
+	/* 
+	 * Prompts user for user name
+	 */
 	private String promptForUserName() {
 		String userName = getUserInput("What's your name, good lookin'?");
 		System.out.println("What a nice name. I'm going to use that as your user name when we record the change information.");	
@@ -128,9 +144,10 @@ public class UserInterface {
 	}
 
 
-
-
-	//	Prompts user for version number. Only integer values are accepted for version number.
+	/* 
+	 * Prompts user for version number.
+	 * Only integer values are accepted for version number.
+	 */
 	private int promptForVersionNumber() {
 		while(true) {
 			int newVersion = getIntegerFromUser("Enter a version number for the new version: (Must be an integer greater than zero)");
@@ -142,12 +159,21 @@ public class UserInterface {
 		}
 	}
 
-	//		Prompts user for old file path. Currently accepts any string as valid file path.
+
+	/* Prompts user for file path. Only used for files to compare. 
+	 * Will not create new file if it doesn't find one.
+	 */
 	private String promptForFilePath(String prompt) {
 		return promptForFilePath(prompt, false);
 	}
 
-	//	Prompts user for old file path. Currently accepts any string as valid file path.
+
+	/* Prompts user for file path. 
+	 * If it's a file to compare, the program checks to see if that file exists. 
+	 * If not, it prompts user again for a file path.
+	 * If it's a change log or source file, 
+	 * if the user enters a file that doesn't exist it will create that file and save to it. 
+	 */
 	private String promptForFilePath(String prompt, boolean createFile) {
 
 		String filePath = null;
@@ -172,9 +198,10 @@ public class UserInterface {
 
 	}
 
-	/*	Prompts user for change information. 
-	 */
 
+	/*	Prompts user for change information. 
+	 * Prints out each modified line and asks user about the change 
+	 */
 	public ArrayList<Change> executeChangeAssignment(ArrayList<ModifiedLine> modifiedLines) {
 		printOutputTopic("CHANGE INFORMATION");
 		System.out.println("Let me get a little information about the changes you're making.");
@@ -213,7 +240,11 @@ public class UserInterface {
 	}
 
 
-	public Change createNewChange(int changeNum) {
+	/* 
+	 * Creates new instance of change. 
+	 * Called in executeChangeAssignment
+	 */
+	private Change createNewChange(int changeNum) {
 		Change.ReasonType reason = getChangeReason();
 		Change change = new Change(changeNum, userName, changeDate, reason);
 		if (reason.equals(Change.ReasonType.Fix)) {
@@ -224,7 +255,8 @@ public class UserInterface {
 		return change;
 	}
 
-	/*	Asks user for reason type. 
+	/*
+	 * Asks user for reason type. 
 	 * Checks to make sure it's one of three valid strings: f, e, or n. 
 	 * If not, repeats until a valid string is entered
 	 */
@@ -245,7 +277,66 @@ public class UserInterface {
 		}
 	}
 
+	/* 
+	 * Asks user if they would like to save information 
+	 * to a change log or source file. 
+	 */
+	public String promptForOutputType() {
+		while(true) {
+			String outputType = getUserInput("How would you like to save the output?: c (change listing), s (annotated source file), or b (both)?");
+			outputType = outputType.toLowerCase();
+			if (outputType.equals("c") || outputType.equals("s") || outputType.equals("b")) {
+				return outputType;
+			} else {
+				System.out.println("Sorry, I don't recognize that change reason.");
+			}
+		}
+	}
 
+
+	/* 
+	 * Used for change number and version number. 
+	 * Makes sure that the value the user enters is an integer.
+	 * If not, continues asking until valid number is entered. 
+	 */
+	private int getIntegerFromUser(String prompt) {
+		while(true) {
+			String input = getUserInput(prompt);
+
+			try {
+				int userNumber = Integer.parseInt(input);
+				return userNumber;
+			} catch (NumberFormatException n) {
+				System.out.println(input + " not an integer!");
+				input = getUserInput(prompt);
+			}
+		}
+
+	}
+
+	/* 
+	 * Used as base method whenever the user interface asks for input from the user.
+	 * Handles exceptions from getting user input.
+	 * Makes sure input string is not null.
+	 */
+	private String getUserInput(String prompt) {
+		String inputLine = null;
+		System.out.print(prompt + " ");
+		try {
+			BufferedReader is = new BufferedReader(
+					new InputStreamReader(System.in));
+			inputLine = is.readLine();
+			if (inputLine.length() == 0) return null;
+		} catch (IOException e) {
+			System.out.println("IOException: " + e);
+		}
+		return inputLine;
+	}
+
+
+	/* 
+	 * Run at the end of main, asks user if she wants to compare another file or exit program.
+	 */
 	public void askToContinue() {
 		System.out.println("Well, you've done it again, old friend. All your changes are recorded and you're good to go.");
 
@@ -265,62 +356,18 @@ public class UserInterface {
 		}
 	}
 
-
-	public String promptForOutputType() {
-		while(true) {
-			String outputType = getUserInput("How would you like to save the output?: c (change listing), s (annotated source file), or b (both)?");
-			outputType = outputType.toLowerCase();
-			if (outputType.equals("c") || outputType.equals("s") || outputType.equals("b")) {
-				return outputType;
-			} else {
-				System.out.println("Sorry, I don't recognize that change reason.");
-			}
-		}
-	}
-
-
-	/* Used for change number and version number. 
-	 * Makes sure that the value the user enters is an integer.
-	 * If not, continues asking until valid number is entered. 
+	/* 
+	 * Adds space between topics displayed to user.
 	 */
-	private int getIntegerFromUser(String prompt) {
-		while(true) {
-			String input = getUserInput(prompt);
-
-			try {
-				int userNumber = Integer.parseInt(input);
-				return userNumber;
-			} catch (NumberFormatException n) {
-				System.out.println(input + " not an integer!");
-				input = getUserInput(prompt);
-			}
-		}
-
+	private void printOutputTopic(String topic) {
+		System.out.println("  ");
+		System.out.println("~~~~~~  " + topic + "  ~~~~~~");
 	}
 
-	/* Used as base method whenever the user interface asks for input from the user.
-	 * Handles exceptions from getting user input.
-	 * Makes sure input string is not null.
+
+	/* 
+	 * Getters for values called by main method. May be out of date.
 	 */
-	private String getUserInput(String prompt) {
-		String inputLine = null;
-		System.out.print(prompt + " ");
-		try {
-			BufferedReader is = new BufferedReader(
-					new InputStreamReader(System.in));
-			inputLine = is.readLine();
-			if (inputLine.length() == 0) return null;
-		} catch (IOException e) {
-			System.out.println("IOException: " + e);
-		}
-		return inputLine;
-	}
-
-
-	//	// Getters for values called by main method
-	//	public Change getChange() {
-	//		return change;
-	//	}
 
 	public int getOldVersion() {
 		oldVersion = newVersion - 1;
