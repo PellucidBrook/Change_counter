@@ -13,26 +13,18 @@ import java.util.Date;
  *
  ****************************************/
 
-/*	Prompts user for change information. 
- * The system design called for a separate method to prompt the user for the change number
- * outside of promptForChangeInfo. I've kept it that way, though I don't fully understand why we're doing it that way. 
- * So for now, we call promptForChangeNumber in promptForChangeInfo, and changeNum is accessible to main in two ways:
- * 1. Call getChange, which returns the change instance created in executeUserInterface
- * 2. Call getChangeNum, which returns only the change number. 
+/*	
+ * Prompts user for change information. 
  */
 
 public class UserInterface {
 
 
-	//	public Program program;
 	private String userName;
-	//	private Change change;
 	private int oldVersion;
 	private int newVersion;
 	private String oldFilePath;
 	private String newFilePath;
-	//	private int changeNum;
-	//	private int defectNum;
 
 	//	OutputInformation
 	private String outputType;
