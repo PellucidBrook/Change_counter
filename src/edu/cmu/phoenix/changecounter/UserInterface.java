@@ -76,45 +76,46 @@ public class UserInterface {
 
 	public void executeOutputMethod(Program newProgram) throws Exception {
 
-		OutputHandler outputHandler = new OutputHandler();
-
 		outputType = promptForOutputType();
 
-		String sourcePrompt = "Enter file path to annotated source file: ";
-		String changePrompt = "Enter file path to change listing: ";
-
 		if (outputType.equals("c")) {
-			changeFile = promptForFilePath(changePrompt);
-			final OutputStream outputStreamChangeFile;
-			try {
-				outputStreamChangeFile = new FileOutputStream(changeFile);
-				outputHandler.writeChangeListing(newProgram, outputStreamChangeFile);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			promptForChangeOutput(newProgram);
 
 		} else if (outputType.equals("s")) {
-			sourceFile = promptForFilePath(sourcePrompt);
-			final OutputStream outputStreamSourceFile;
-			try {
-				outputStreamSourceFile = new FileOutputStream(sourceFile);
-				outputHandler.writeAnnotatedSourceFile(newProgram, outputStreamSourceFile);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			promptForSourceOutput(newProgram);
 
 		} else if (outputType.equals("b")) {
-			changeFile = promptForFilePath(changePrompt);
-			sourceFile = promptForFilePath(sourcePrompt);
+			promptForChangeOutput(newProgram);
+			promptForSourceOutput(newProgram);
 		} else {
 			System.out.println("WHAT HAVE YOU DONE? You shouldn't be here! There must have been a problem getting the output type from the user");
 		}
-
-
 	}
 
+	private void promptForChangeOutput(Program newProgram) throws FileNotFoundException {
+		String changePrompt = "Enter file path to change listing: ";
+		OutputHandler outputHandler = new OutputHandler();
+		changeFile = promptForFilePath(changePrompt);
+//		final OutputStream outputStreamChangeFile;
+		outputHandler.writeChangeListing(newProgram, changeFile);
+	}
+
+	private void promptForSourceOutput(Program newProgram) {
+		String sourcePrompt = "Enter file path to annotated source file: ";
+		OutputHandler outputHandler = new OutputHandler();
+		sourceFile = promptForFilePath(sourcePrompt);
+		final OutputStream outputStreamSourceFile;
+		try {
+			outputStreamSourceFile = new FileOutputStream(sourceFile);
+			outputHandler.writeAnnotatedSourceFile(newProgram, outputStreamSourceFile);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
 	private String promptForUserName() {
@@ -140,10 +141,19 @@ public class UserInterface {
 
 	//	Prompts user for old file path. Currently accepts any string as valid file path.
 	private String promptForFilePath(String prompt) {
-		String filePath = getUserInput(prompt);
-		return filePath;
-	}
 
+		String filePath = null;
+		while(true) {
+			filePath = getUserInput(prompt);
+			File file = new File(filePath);
+			if(file.exists()) { 
+				return filePath;
+			} else {
+				System.out.println("I can't find that file. Let's try again.");
+			}
+		}
+
+	}
 
 	/*	Prompts user for change information. 
 	 */
@@ -297,6 +307,8 @@ public class UserInterface {
 	public String getNewFilePath() {
 		return newFilePath;
 	}
+
+
 
 
 }

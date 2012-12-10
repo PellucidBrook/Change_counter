@@ -15,19 +15,33 @@ public class OutputHandler {
 
 	}
 
-	public void writeChangeListing(Program newCL, OutputStream oStream) {
+	public void writeChangeListing(Program newCL, String file) {
 		String stringToWrite;
 		Header headerToWrite;
 
 		headerToWrite = newCL.getProgramHeader();
 		stringToWrite = headerToWrite.render();
-		try {
-			oStream.writeChars(stringToWrite);
-			oStream.flush();
-			oStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+//		try {
+//			PrintStream out = new PrintStream(oStream);
+//			out.print(stringToWrite);
+////			oStream.writeChars(stringToWrite);
+////			oStream.flush();
+////			oStream.close();
+//		} catch (IOException ex) {
+//			ex.printStackTrace();
+//		} 
+		
+	    try {
+	        FileOutputStream fout = new FileOutputStream(file);
+	        PrintStream out = new PrintStream(fout);
+	        out.println(stringToWrite);
+	      } catch (IOException ex) {
+	        System.out.println("There was a problem creating/writing to the temp file");
+	        ex.printStackTrace();
+	      }
+		
+		
+		
 	}
 
 	/**
