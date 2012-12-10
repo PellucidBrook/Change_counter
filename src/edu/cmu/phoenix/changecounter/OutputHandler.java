@@ -10,43 +10,43 @@ import java.io.*;
  ****************************************/
 
 public class OutputHandler {
-        
-	public OutputHandler() {
-		
-        }
 
-        public void writeChangeListing(Program newCL, OutputStream oStream) {
-                String stringToWrite;
+	public OutputHandler() {
+
+	}
+
+	public void writeChangeListing(Program newCL, OutputStream oStream) {
+		String stringToWrite;
 		Header headerToWrite;
-		
+
 		headerToWrite = newCL.getProgramHeader();
 		stringToWrite = headerToWrite.render();
 		try {
 			oStream.writeChars(stringToWrite);
 			oStream.flush();
 			oStream.close();
-                } catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-                } 
+		} 
 	}
 
-    /**
-     * Writes a source file with an updated header.
-     * 
-     * @param Program to write the updated source file for.
-     * @param Stream to write the updated source file to.
-     */
+	/**
+	 * Writes a source file with an updated header.
+	 * 
+	 * @param Program to write the updated source file for.
+	 * @param Stream to write the updated source file to.
+	 */
 	public void writeAnnotatedSourceFile(Program newSF, OutputStream oStream) throws Exception {
 		StringBuffer sourceFileData = new StringBuffer();
-		
+
 		// Read original file contents
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(newSF.getFileName()));		
-		
+
 			char[] buf = new char[1024];
 			int numRead = 0;				
-		
+
 			while((numRead=reader.read(buf)) != -1) {
 				String readData = String.valueOf(buf, 0, numRead);
 				sourceFileData.append(readData);
@@ -73,12 +73,12 @@ public class OutputHandler {
 	}
 
 	public boolean closeIO (OutputStream oStream) {
-	        try {
+		try {
 			oStream.close();
 			return true;
-                } catch (IOException e) {
+		} catch (IOException e) {
 			return false;
-                }
+		}
 	}
 }
 
