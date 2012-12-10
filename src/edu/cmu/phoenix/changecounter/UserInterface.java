@@ -51,6 +51,7 @@ public class UserInterface {
 		printOutputTopic("TSP CHANGE COUNTER");
 		System.out.println("Welcome to the TSP Change Counter! Glad you could be here today.");
 		System.out.println("You're going to need to files to compare and I'll ask you for additional information along the way");
+		System.out.println("You can exit at any time by entering 'q'");
 
 		printOutputTopic("GATHERING INITIAL INFORMATION");
 		System.out.println("Let's not get ahead of ourselves though.");
