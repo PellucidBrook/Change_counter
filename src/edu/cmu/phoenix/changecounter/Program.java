@@ -19,14 +19,11 @@ public class Program {
 	private int    totalLOC;
 	private Header programHeader = new Header();
 	
-	public Program(int version, String newFilePath) {
+	public Program(int version, String filePath) {
 		super();
 		this.version = version;
 		programHeader.addVersion(version);
-		
-		String[] filePath = newFilePath.split("/");
-		String file = filePath[filePath.length-1];
-		this.fileName = file;
+		this.fileName = filePath;
 	}
 	
 	public int getVersion() {
@@ -39,11 +36,8 @@ public class Program {
 	public String getFileName() {
 		return fileName;
 	}
-	public void setFileName(String newFilePath) {
-		String[] filePath = newFilePath.split("/");
-		String file = filePath[filePath.length-1];
-		
-		this.fileName = file;
+	public void setFileName(String filePath) {
+		this.fileName = filePath;
 	}
 	
 	public int getTotalLOC(File givenFilePath) throws IOException {
