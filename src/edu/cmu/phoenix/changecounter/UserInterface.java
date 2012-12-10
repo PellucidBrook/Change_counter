@@ -191,7 +191,8 @@ public class UserInterface {
 	}
 
 
-	/*	Prompts user for change information. 
+	/*
+	 * Prompts user for change information. 
 	 * Prints out each modified line and asks user about the change 
 	 */
 	public ArrayList<Change> executeChangeAssignment(ArrayList<ModifiedLine> modifiedLines) {
@@ -205,14 +206,19 @@ public class UserInterface {
 		System.out.println(" ");
 		ArrayList<Change> changes = new ArrayList<Change>();
 
+
+		//		int numChanges = 0;
+		String changePrompt = "Enter a change number for this line: ";
+
+		printOutputTopic("MODIFIED LINES");
 		for (ModifiedLine line : modifiedLines) {
 			int oldChange = 0;
 			{
 				oldChange = 0;
-				System.out.println("Next modified line (line " + line.getLineNumber() + ")");
-				System.out.println(line.getLine());
+				System.out.println("  ");
+				System.out.println("    Line " + line.getLineNumber() + ":  " + line.getLine());
 
-				int changeNum = getIntegerFromUser("Enter a change number for this line: ");
+				int changeNum = getIntegerFromUser(changePrompt);
 
 				for(Change change : changes) {
 					if(change.getNumber() == changeNum) {
@@ -221,6 +227,7 @@ public class UserInterface {
 						oldChange = 1;
 						break; }
 				}
+
 				if (oldChange == 0) {
 					System.out.println("You haven't used this change number before.");
 					System.out.println("I'll need to get a reason for this change from you.");
