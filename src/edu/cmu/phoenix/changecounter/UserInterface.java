@@ -96,7 +96,7 @@ public class UserInterface {
 		String changePrompt = "Enter file path to change listing: ";
 		OutputHandler outputHandler = new OutputHandler();
 		changeFile = promptForFilePath(changePrompt);
-//		final OutputStream outputStreamChangeFile;
+		//		final OutputStream outputStreamChangeFile;
 		outputHandler.writeChangeListing(newProgram, changeFile);
 	}
 
@@ -165,7 +165,7 @@ public class UserInterface {
 		System.out.println("You can assign multiple modified lines to a single change number, so if you enter the same change number for two different lines,");
 		System.out.println("both of those lines will be associated with the same change number.");
 		System.out.println("If you're in a rush, you can also assign all remaning modified lines to a single change number and reason.");
-
+		System.out.println(" ");
 		ArrayList<Change> changes = new ArrayList<Change>();
 
 		for (ModifiedLine line : modifiedLines) {
@@ -173,18 +173,24 @@ public class UserInterface {
 				System.out.println("Next modified line (line " + line.getLineNumber() + ")");
 				System.out.println(line.getLine());
 
+
 				int changeNum = getIntegerFromUser("Enter a change number for this line: ");
+
+				int oldChange = 0;
+
 				for(Change change : changes) {
 					if(change.getNumber() == changeNum) {
 						System.out.println("You've used this change number before. I'll add this line to that change.");
 						change.addLine(line);
+						oldChange = 1;
 						break; }
-					else {
-						System.out.println("You haven't used this change number before.");
-						System.out.println("I'll need to get a reason for this change from you.");
-						changes.add(createNewChange(changeNum));
-					}
-				}	
+				}
+
+				if (oldChange == 0) {
+					System.out.println("You haven't used this change number before.");
+					System.out.println("I'll need to get a reason for this change from you.");
+					changes.add(createNewChange(changeNum));
+				}
 			}
 		}
 		return changes;	
@@ -229,11 +235,30 @@ public class UserInterface {
 	}
 
 
+	public void askToContinue() {
+		System.out.println("Well, you've done it again, old friend. All your changes are recorded and you're good to go.");
+
+		while(true) {
+			String continueExit = getUserInput("Would you like to continue comparing files, or are you all done? Press 'c' to continue or 'q' to quit.");
+			continueExit = continueExit.toLowerCase();
+			if (continueExit.equals("c")) {
+				System.out.println("Splendid! I could spend all day chatting with you.");
+				return;
+			} else if (continueExit.equals("q")){
+				System.out.println("Well, I can't say I won't miss you.");
+				System.exit(0);
+				return;
+			} else {
+				System.out.println("Sorry, I don't recognize that. Let's try again.");
+			}
+		}
+	}
+
+
 	public String promptForOutputType() {
 		while(true) {
 			String outputType = getUserInput("How would you like to save the output?: c (change listing), s (annotated source file), or b (both)?");
 			outputType = outputType.toLowerCase();
-
 			if (outputType.equals("c") || outputType.equals("s") || outputType.equals("b")) {
 				return outputType;
 			} else {

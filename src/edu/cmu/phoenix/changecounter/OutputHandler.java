@@ -21,15 +21,6 @@ public class OutputHandler {
 
 		headerToWrite = newCL.getProgramHeader();
 		stringToWrite = headerToWrite.render();
-//		try {
-//			PrintStream out = new PrintStream(oStream);
-//			out.print(stringToWrite);
-////			oStream.writeChars(stringToWrite);
-////			oStream.flush();
-////			oStream.close();
-//		} catch (IOException ex) {
-//			ex.printStackTrace();
-//		} 
 		
 	    try {
 	        FileOutputStream fout = new FileOutputStream(file);

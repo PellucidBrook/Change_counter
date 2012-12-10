@@ -41,6 +41,9 @@ public class ChangeCounter {
 			}
 
 
+			userInterface.askToContinue();
+
+
 		}
 
 	}
