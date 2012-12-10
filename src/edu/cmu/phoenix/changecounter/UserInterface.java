@@ -95,7 +95,7 @@ public class UserInterface {
 	private void promptForChangeOutput(Program newProgram) throws FileNotFoundException {
 		String changePrompt = "Enter file path to change listing: ";
 		OutputHandler outputHandler = new OutputHandler();
-		changeFile = promptForFilePath(changePrompt);
+		changeFile = promptForFilePath(changePrompt, true);
 		//		final OutputStream outputStreamChangeFile;
 		outputHandler.writeChangeListing(newProgram, changeFile);
 	}
@@ -103,7 +103,7 @@ public class UserInterface {
 	private void promptForSourceOutput(Program newProgram) {
 		String sourcePrompt = "Enter file path to annotated source file: ";
 		OutputHandler outputHandler = new OutputHandler();
-		sourceFile = promptForFilePath(sourcePrompt);
+		sourceFile = promptForFilePath(sourcePrompt, true);
 		final OutputStream outputStreamSourceFile;
 		try {
 			outputStreamSourceFile = new FileOutputStream(sourceFile);
@@ -139,8 +139,13 @@ public class UserInterface {
 		}
 	}
 
-	//	Prompts user for old file path. Currently accepts any string as valid file path.
+//		Prompts user for old file path. Currently accepts any string as valid file path.
 	private String promptForFilePath(String prompt) {
+		return promptForFilePath(prompt, false);
+	}
+	
+	//	Prompts user for old file path. Currently accepts any string as valid file path.
+	private String promptForFilePath(String prompt, boolean createFile) {
 
 		String filePath = null;
 		while(true) {
@@ -149,7 +154,16 @@ public class UserInterface {
 			if(file.exists()) { 
 				return filePath;
 			} else {
-				System.out.println("I can't find that file. Let's try again.");
+				if(createFile) {
+					try {
+						file.createNewFile();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return filePath;
+				} else {
+					System.out.println("I can't find that file. Let's try again.");
+				}
 			}
 		}
 

@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,7 +149,7 @@ public class Header {
 	 */
 	public String writeHeader(String contents) throws IOException {
 		Integer headerStart = findHeaderStart(contents);
-		Integer headerEnd = findHeaderEnd(contents);
+		Integer headerEnd = findHeaderEnd(headerStart, contents);
 		
 		StringBuilder result = new StringBuilder();
 		
@@ -169,22 +170,54 @@ public class Header {
 		return start != null && end != null;
 	}
 	
-	private Integer findHeaderStart(String contents) {
-		Matcher match = headerStartPattern.matcher(contents);
-		if(match.matches()) {
-			return match.start();
-		} else {
-			return null;
-		}		
-	}
-	
-	private Integer findHeaderEnd(String contents) {
-		Matcher match = headerEndPattern.matcher(contents);
-		if(match.matches()) {
-			return match.end();
-		} else {
+	private Integer findHeaderStart(String contents) {		
+		BufferedReader reader = new BufferedReader(new StringReader(contents));
+
+		int loc = 0;
+		
+		try{
+			String line;
+			while ((line = reader.readLine()) != null)   {
+				Matcher match = headerStartPattern.matcher(line);
+				if(match.matches()) {
+					return loc + match.start();
+				}
+				
+				loc += line.length() + 1; // Keep track of the current source position, including the newline character
+			}
+			reader.close();
+		} catch (Exception e) {
 			return null;
 		}
+		
+		return null;
+	}
+	
+	private Integer findHeaderEnd(Integer headerStart, String contents) {
+		if(headerStart == null) {
+			return null;
+		}
+		
+		BufferedReader reader = new BufferedReader(new StringReader(contents.substring(headerStart)));
+
+		int loc = 0;
+		
+		try{
+			String line;
+			while ((line = reader.readLine()) != null)   {
+				Matcher match = headerEndPattern.matcher(line);
+				if(match.matches()) {
+					return loc + match.end();
+				}
+				
+				loc += line.length() + 1; // Keep track of the current source position, including the newline character
+			}
+			reader.close();
+		} catch (Exception e) {
+			return null;
+		}
+		
+		return null;
 	}
 	
 	

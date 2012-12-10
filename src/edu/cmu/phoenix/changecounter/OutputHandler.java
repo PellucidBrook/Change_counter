@@ -73,7 +73,9 @@ public class OutputHandler {
 		} catch (IOException e) {
 			throw new Exception("Unable to write annotated source file.", e);
 		} finally {
-			writer.close();
+			if(writer != null) {
+				writer.close();
+			}
 		}
 	}
 

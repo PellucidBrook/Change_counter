@@ -22,8 +22,8 @@ public class Program {
 	public Program(int version, String filePath) {
 		super();
 		this.version = version;
+		setFileName(filePath);
 		programHeader.addVersion(version);
-		this.fileName = filePath;
 	}
 	
 	public int getVersion() {
@@ -38,6 +38,12 @@ public class Program {
 	}
 	public void setFileName(String filePath) {
 		this.fileName = filePath;
+		
+		try {
+			programHeader.readHeader(new File(filePath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public int getTotalLOC(File givenFilePath) throws IOException {
