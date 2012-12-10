@@ -1,0 +1,198 @@
+function [d] = baseline_Gaussian( UAVtracks, tracks, pos_Dev, NMAC_Cyl, Time_scale)
+
+%baseline_Gaussian - calculates Baseline NMAC parameter using a Geometric 
+%search withing a 99% confidence area on position using the joint Gaussian 
+%distribution defined by pos_Dev, and zero vector mean. 
+
+%Extends baseline_Geo, by picking up probability mass over larger variations
+%for the UAS tracks, and making the same kind of calculation for smaller 
+%data sets. These two methods will converge to the same estimates for large
+%data sets of "tracks"
+
+%REQUIRED INPUT
+%UAVtracks = cell array of UAV aircraft profile tracks
+%tracks = cell array of intruder aircraft profile tracks
+%NMAC_Cyl = 1x2 definition of the horizontal/vertical miss distance (nm/feet)
+%pos_Delta = 1x2 definition of standard devation from horizontal/vertical
+%position error (nm/feet)
+
+%OUTPUT
+%d = structure containing baseline, information on the observed
+%survelliance time, and NMACs
+%
+%See also: baseline_Geo, probability_Calc
+
+%Author(s): Andrew Weinert & Evan Maki
+%Created: May 26, 2010 
+%Last Updated: June 7, 2010
+
+%% Error and exception handling for input arguments
+tic
+if nargin < 2
+    error('MATLAB:baseline_Geo:NoInputs',['No input argument specified. ' ...
+        'There should be at least two input arguments.'])
+elseif nargin == 2
+    % Default position error is 1/2 mile and 250 feet
+    pos_Dev = [.5, 250];
+    % Default NMAC is 500 feet horizontally and 100 feet vertically
+    NMAC_Cyl = [0.0822894168,100]; 
+    % Default poisson time interval is one hour
+    Time_scale = 3600; 
+elseif nargin ==3
+    % Default NMAC is 500 feet horizontally and 100 feet vertically
+    NMAC_Cyl = [0.0822894168,100]; 
+    % Default poisson time interval is one hour
+    Time_scale = 3600; 
+elseif nargin ==4
+    % Default poisson time interval is one hour
+    Time_scale = 3600; 
+end    
+
+%% Create output structure
+d = struct(...
+    'baseline',0,...%Proability of a NMAC event (over poisson_T units time)
+    'lambda',[0 0],... %Poisson parameter for each UAV track
+    'tSurveillance',0,... %the observed surveillance duration for the aircraft profiles
+    'tStart',0,...the first observed survelliance time for all of the aircraft profiles
+    'tEnd',0,...the last observed survelliance time for all of the aircraft profiles
+    'tUAV', [],... %observed length of flight from perspective of the UAV
+    'uavDelta',[],...Flags 1 if NMAC occured at timestep from perspective of UAV
+    'tracksDelta',[],...Flags 1 if NMAC occured at timestep from perspective of intruder
+    'binBucket',[],...Flags 1 if NMAC occured for corresponding take-off time
+    'uniqueNMAC',0);%Counter of unique NMAC events
+
+%% kd-Tree and candidates generation
+% Creates giantTracks which contains all track profiles and coordinates, this allows to create only 1 kd-tree,
+% instead of an individual kd-tree for each unique track profile.
+% It will then include the x,y,z coordinates and create a kd-tree for all track profiles.
+% idx is an index that allows us to determine which each unique track begins and ends within
+% giantTracks and the kd-tree. We then complete a kd-tree cylinder range
+% using the NMAC dimensions and x,y,z coordinates.
+% NOTE: Time is not a factor in the kd-tree creation or search
+giantTracks = cell2mat(tracks');
+giantTracks = giantTracks(:,2:4);
+tree = kdtree(giantTracks); %Creates kd-tree for all tracks aircraft profile
+% disp('kd-Tree generated');
+idx = [0 cumsum(cellfun(@(x)size(x,1), tracks))];
+
+% tracksMat = cell2mat(tracks');
+% tracksMat = tracksMat(:,2:4);
+% candidates = kdtree_cylinderrange(tree, tracksMat', 0.0822894168,100, idx);
+%All possible candidates that result in a NMAC as returned by kd-tree search
+
+UAVMat = cell2mat(UAVtracks');
+UAVMat = UAVMat(:,2:4);
+
+%% Perfomance of geometric search to determine where NMAC event occur is
+%% space. 
+
+candidates = kdtree_cylinderrange(tree, UAVMat', 2.5*pos_Dev(1),2.5*pos_Dev(2), idx);%All possible candidates that result in a NMAC as returned by kd-tree search
+
+%% Performance of NMAC analysis requires a computation of takeoff times
+%% relative to a universal time
+[d.tSurveillance d.tStart d.tEnd] = findSurveillanceTime(tracks); % total universal/surveillance time
+
+%% We will need to calculate UAS flight times for later use
+for i=1:numel(UAVtracks)
+    d.tUAV(i) = numel(UAVtracks{i}(:,1));
+end
+
+%% uavDelta is the total time of flight for each UA segment (exposure)
+%% the uav time is relative with respect to universal time
+d.uavDelta = cell(1,numel(UAVtracks));
+for i=1:1:numel(d.uavDelta)
+    d.uavDelta{i}=zeros(length(UAVtracks{i}),2);
+    d.uavDelta{i}(:,1)=UAVtracks{i}(:,1); %Relative Time from perspective wrt UA takeoff
+end
+
+%% we will need to index within tracks to get the real time of NMAC 
+%% each track has a universal time (recorded time) which is fixed
+d.tracksDelta = cell(1,numel(tracks));
+for i=1:1:numel(d.tracksDelta)
+    d.tracksDelta{i}= zeros(length(tracks{i}(:,1)),2);
+    d.tracksDelta{i}(:,1)=tracks{i}(:,1);%Universal Time from perspective of intruder
+end
+
+
+%%%%%%%%% Seperate Poisson calculation for each UAVtrack %%%%%%%%%%%
+% MODIFICATION: 28 MAY 2010
+% Previous Code: required change to inspect individual UAV tracks 
+% d.timeDelta = zeros(d.tSurveillance, 1));
+%
+% NEW CODE: timeDelta is now called binBucket, and is a cellular array
+% which allows a binBucket for a takeoff time that corresponds to each
+% UA profile. The binBuckets collect probability mass, which is either a 0
+% or 1 for the geometric search, but can be a real positive number for the
+% gaussian method. We also have to take out the last bit of data where
+% takeoff times have flight paths that extend beyond the surveillance
+% period.
+d.binBucket = cell(1,numel(UAVtracks));
+for k = 1:numel(UAVtracks)
+    d.binBucket{k} = zeros(d.tSurveillance - d.tUAV(k), 1);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+ind = 1; %Counter for all UAV points to access candidates from kd-tree
+         % <needed because i will start over at 1 for each uav track>
+
+for j = 1: numel(UAVtracks) %Iterates each unique jth UA segment passed 
+    for i=1:size(UAVtracks{j},1) %Iterates each timestep for the unique UA segment j
+        c = candidates{ind}; %NMAC candidates for the current timestep, i
+        if ~isempty(c) %Will only pass if candidates exists (increases performance)
+            
+            profiles = zeros(1,numel(c));
+            for k=1:length(c)%Iterates for each candidate
+                profiles(k) = find(c(k) >= idx, 1, 'last'); 
+                % profiles(k) is the track number of the aircraft profile that the 
+                % kth candidate comes from (the intruder track number)
+                
+                %NMAC hit in terms of track index
+                trackHit = c(k) - idx(profiles(k));
+                % trackHit is the index to the near miss point in the 
+                % track, which can be determined by tracks{profiles(k)}
+                
+                d.uavDelta{j}(i+1,2)=1; %record of hit points within UAV track??
+                if trackHit >= 1
+                    %Make record of the hit point in the intruder track
+                    d.tracksDelta{profiles(k)}(trackHit+1,2) = 1;
+                    
+                    %Increment a positive probability of NMAC for this
+                    %particular take-off time
+                    if (d.tracksDelta{profiles(k)}(trackHit+1,1)-d.tStart-i >= 1)&&...
+                       (d.tracksDelta{profiles(k)}(trackHit+1,1)-d.tStart-i <= d.tSurveillance - d.tUAV(j))
+                   
+                        %capture distance at this cpa
+                        delta_x = abs(tracks{profiles(k)}(trackHit+1,2) - UAVtracks{j}(i,2));
+                        delta_y = abs(tracks{profiles(k)}(trackHit+1,3) - UAVtracks{j}(i,3));
+                        cpa_h = sqrt(delta_x^2 + delta_y^2);
+                        
+                        %capture relative height at this cpa
+                        cpa_v = abs(tracks{profiles(k)}(trackHit+1,4) - UAVtracks{j}(i,4));
+                        
+                        %compute probability of being in NMAC cylinder
+                        NMAC_Prob = probability_Calc(cpa_h, cpa_v, NMAC_Cyl(1), NMAC_Cyl(2), pos_Dev);
+                        %NMAC_Prob = integrate_NMAC_Cyl(cpa_h, cpa_v, NMAC_Cyl(1), NMAC_Cyl(2), pos_Dev, 100);
+                        prior_Mass = d.binBucket{j}(d.tracksDelta{profiles(k)}(trackHit+1,1)-d.tStart-i);
+                        
+                        % collect the probability mass into the bin buckets
+                        take_off_partition = d.tracksDelta{profiles(k)}(trackHit+1,1)-d.tStart-i;
+                        d.binBucket{j}(take_off_partition) = prior_Mass + NMAC_Prob;
+                        if d.binBucket{j}(take_off_partition) >= 1
+                            warning(['Saturated partition for takeoff time: ' num2str(take_off_partition)]);
+                            %d.binBucket{j}(take_off_partition) = 1;
+                        end
+                    end
+                end
+                d.uniqueNMAC = d.uniqueNMAC+1;
+            end
+        end
+        ind = ind + 1;
+    end
+%     disp([num2str(j) '/' num2str(numel(UAVtracks)) ',Total unique NMAC events = ' num2str(d.uniqueNMAC)]);
+end;
+
+disp('UAV Tracks Processed');
+
+
+toc
