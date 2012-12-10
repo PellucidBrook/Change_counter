@@ -206,8 +206,6 @@ public class UserInterface {
 		System.out.println(" ");
 		ArrayList<Change> changes = new ArrayList<Change>();
 
-
-		//		int numChanges = 0;
 		String changePrompt = "Enter a change number for this line: ";
 
 		printOutputTopic("MODIFIED LINES");
@@ -319,8 +317,22 @@ public class UserInterface {
 	 * Makes sure input string is not null.
 	 */
 	private String getUserInput(String prompt) {
-		String inputLine = null;
 		System.out.print(prompt + " ");
+
+		String inputLine = checkUserInput();
+
+		if (inputLine.equalsIgnoreCase("quit")) {
+			promptExitProgram();
+		}
+
+		return inputLine;
+	}
+
+	/* 
+	 * Catches exceptions thrown by user input
+	 */
+	private String checkUserInput() {
+		String inputLine = null;
 		try {
 			BufferedReader is = new BufferedReader(
 					new InputStreamReader(System.in));
@@ -329,8 +341,35 @@ public class UserInterface {
 		} catch (IOException e) {
 			System.out.println("IOException: " + e);
 		}
+
+		if (inputLine.equalsIgnoreCase("q")) {
+			promptExitProgram();
+		}
 		return inputLine;
 	}
+
+	/* 
+	 * If a user enters 'q' at any time, they will be brought here, asking if they want to quit.
+	 */
+	private void promptExitProgram() {
+		System.out.println("You've entered 'q', indicating you want to quit. Before we make any rash decisions, let me double check: ");
+
+		while(true) {
+			System.out.println("Are you sure you want to quit? Enter 'y' to quit, or 'n', to continue. ");
+			String input = checkUserInput();
+
+			if (input.equals("n")) {
+				System.out.println("Alright, let's continue.");
+				return;
+			} else if (input.equals("y")){
+				System.out.println("Well, I can't say I won't miss you.");
+				System.exit(0);
+			} else {
+				System.out.println("Sorry, I don't recognize that. Let's try again.");
+			}
+		}
+	}
+
 
 
 	/* 
